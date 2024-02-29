@@ -22,7 +22,7 @@ def homepage_view(request):
     return render(request, 'homepage.html', context)
 
 def search_product(request):
-    # 处理搜索请求
+    # 处理搜索请求(参考交易的改）
     if request.method == 'GET':
         postcode = request.GET.get('postcode')
         distance_value = request.GET.get('distance')
