@@ -11,7 +11,7 @@ def create_product(request):
         price = request.POST.get('price')
         description = request.POST.get('description')
         
-        # 创建商品对象并保存到数据库
+        # create Product
         product = Product.objects.create(
             Title=title,
             Date=date,
@@ -20,25 +20,45 @@ def create_product(request):
             SellerID=request.user,
         )
         
-        # 创建订单对象并保存到数据库
+        # create Order (BuyerID will set up when Someone wanna to buy it)
         order = Order.objects.create(
-            BuyerID=None,  # 设置买家为空
-            SellerID=request.user,  # 卖家为当前登录用户
+            BuyerID=None,
+            SellerID=request.user,
             ProductID=product,
-            Time=timezone.now(),  # 使用当前时间作为订单时间
-            IsBanned=False,  # 默认订单不被禁止
-            IsFinished=False,  # 默认订单未完成
-            IsAgreed=False,
+            Time=timezone.now(),
+            IsBanned=False,  # Defuat
+            IsFinished=False,  # Defuat
+            IsAgreed=False,  # Defuat
         )
         
-        return redirect('product_detail', product_id=product.id)  # 重定向到新创建商品的详情页面
+        return redirect('product_detail', product_id=product.id)
     else:
         return render(request, 'create_product.html')
 
 def view_pending_orders(request):
-    # 查询所有未完成、未被禁止且买家为空的订单
+    # IsFinished=False(Not be selled), IsBanned=False(not be baned), BuyerID=None(No one wanna buy is now)
     pending_orders = Order.objects.filter(IsFinished=False, IsBanned=False, BuyerID=None)
-    
-    # 将查询结果传递给模板进行展示
     return render(request, 'pending_orders.html', {'pending_orders': pending_orders})
 
+@login_required
+def buy_product(request, product_id):
+    if request.method == 'POST':
+
+        # get informations
+        buyer = request.user
+        product = Product.objects.get(id=product_id)
+        
+        try:
+            # check the order
+            order = Order.objects.get(ProductID=product, BuyerID=None)
+            
+            # update it
+            order.BuyerID = buyer
+            order.Time = timezone.now()
+            order.save()
+            
+            return redirect('product_detail', product_id=product_id)
+        except Order.DoesNotExist:
+            return redirect('product_detail', product_id=product_id)
+    else:
+        return render(request, 'buy_product.html', {'product_id': product_id})
