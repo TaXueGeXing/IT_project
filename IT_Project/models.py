@@ -42,3 +42,4 @@ class Order(models.Model):
     Time = models.DateTimeField()
     IsBanned = models.BooleanField()
     IsFinished = models.BooleanField()
+    IsAgreed = models.BooleanField()
