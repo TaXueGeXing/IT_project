@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 def carwiki_view(request):
     # 获取默认产品（最新发布的五种车）
