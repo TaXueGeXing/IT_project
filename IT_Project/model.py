@@ -10,10 +10,6 @@ class Car(models.Model):
     define = models.TextField()
     brand = models.TextField()
 
-    def get_absolute_url(self):
-
-        return redirect(reverse('car_detail', args=[str(self.carID)]))
-
 
 class Product(models.Model):
     productID = models.CharField(max_length=8)
