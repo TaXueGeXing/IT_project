@@ -1,7 +1,7 @@
 from django.db import models
 
 class User(models.Model):
-    UserID = models.CharField(max_length=8)
+    UserID = models.AutoField(primary_key=True)
     UserName = models.CharField(max_length=30)
     Password = models.CharField(max_length=30)
     Email = models.EmailField()
@@ -9,25 +9,19 @@ class User(models.Model):
     Picture = models.ImageField()
 
 class Article(models.Model):
-    ArticleID = models.CharField(max_length=8)
+    ArticleID = models.AutoField(primary_key=True)
     UserID = models.ForeignKey(User, on_delete=models.CASCADE)
     Title = models.CharField(max_length=100)
     Content = models.TextField()
     Tag = models.CharField(max_length=30)
 
 class Reply(models.Model):
-    ReplyID = models.CharField(max_length=8)
+    ReplyID = models.AutoField(primary_key=True)
     ArticleID = models.ForeignKey(Article, on_delete=models.CASCADE)
     Time = models.DateTimeField()
 
-class Car(models.Model):
-    CarID = models.CharField(max_length=8)
-    Type = models.CharField(max_length=30)
-    Define = models.CharField(max_length=30)
-    Brand = models.CharField(max_length=30)
-
 class Product(models.Model):
-    ProductID = models.CharField(max_length=8)
+    ProductID = models.AutoField(primary_key=True)
     SellerID = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
     Date = models.DateField()
     Price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -35,7 +29,7 @@ class Product(models.Model):
     Title = models.CharField(max_length=100)
 
 class Order(models.Model):
-    OrderID = models.CharField(max_length=8)
+    OrderID = models.AutoField(primary_key=True)
     BuyerID = models.ForeignKey(User, on_delete=models.CASCADE, related_name='buyer_orders')
     SellerID = models.ForeignKey(User, on_delete=models.CASCADE, related_name='seller_orders')
     ProductID = models.ForeignKey(Product, on_delete=models.CASCADE)
