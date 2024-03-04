@@ -15,7 +15,12 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
 
-#login_required
+@login_required
+def view_profile(request):
+    profile = request.user.profile  # 假设你的个人资料模型与用户模型关联，并且每个用户有一个 profile 属性来访问个人资料
+    return render(request, 'profile.html', {'profile': profile})
+
+@login_required
 def edit_profile(request):
     if request.method == 'POST':
         form = EditProfileForm(request.POST, instance=request.user)
@@ -26,7 +31,7 @@ def edit_profile(request):
         form = EditProfileForm(instance=request.user)
     return render(request, 'edit_profile.html', {'form': form})
 
-#login_required
+@login_required
 def view_transactions(request):
     transactions = Transaction.objects.filter(user=request.user)
     return render(request, 'transactions.html', {'transactions': transactions})
@@ -52,7 +57,7 @@ class CarPostListView(ListView):
     model = CarPost
     template_name = 'community/carpost_list.html'  # 指定要使用的模板
 
-#login_required
+@login_required
 def create_carpost(request):
     if request.method == 'POST':
         form = CarPostForm(request.POST)
