@@ -22,9 +22,8 @@ urlpatterns = [
 
     path('ranking/', views.home, name='home'),
     path('carwiki/', views.carwiki, name='carwiki'),
+    path('search/car/', views.search_car, name='search_car'),
     path('car_detail/<str:car_id>/', views.car_detail, name='car_detail'),
+    path('search/product/', views.search_product, name='search_product'),
     path('about-us/', views.about_us, name='about_us'),
-    path('about-us/web-information/', views.webinformation, name='webinformation'),
-    path('about-us/support/', views.support, name='support'),
-    path('community', views.community, name='community')
 ]
