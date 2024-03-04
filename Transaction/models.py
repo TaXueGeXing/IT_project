@@ -43,3 +43,5 @@ class Order(models.Model):
     IsBanned = models.BooleanField()
     IsFinished = models.BooleanField()
     IsAgreed = models.BooleanField()
+
+# Create your models here.

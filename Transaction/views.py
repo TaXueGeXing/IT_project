@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import *
 from django.utils import timezone
@@ -62,3 +63,25 @@ def buy_product(request, product_id):
             return redirect('product_detail', product_id=product_id)
     else:
         return render(request, 'buy_product.html', {'product_id': product_id})
+
+
+def view_order_contact(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id)
+    if order.IsAgreed and not order.IsBanned: #Check order is available
+        # get connections
+        buyer_contact = order.BuyerID.Email, order.BuyerID.PhoneNo
+        seller_contact = order.SellerID.Email, order.SellerID.PhoneNo
+        
+        return render(request, 'order_details.html', {'order': order, 'buyer_contact': buyer_contact, 'seller_contact': seller_contact})
+    else:
+        return render(request, 'order_not_available.html')
+
+def complete_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    order.IsFinished = True
+    order.save()
+    
+    return redirect('order_detail', order_id=order_id)
+# Create your views here.
