@@ -26,15 +26,16 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('transactions/', views.view_transactions, name='view_transactions'),
-    path('transactions/<int:pk>/', views.transaction_detail, name='transaction_detail'),
-    path('search-by-tag/', views.search_by_tag, name='search_by_tag'),
+    path('transactions/detail.html', views.transaction_detail, name='transaction_detail'),
+    path('community/search_results.html', views.search_by_tag, name='search_by_tag'),
 
     path('change-password/', auth_views.PasswordChangeView.as_view(
         template_name='change_password.html',
-        success_url='/profile/'  # 假设密码更改成功后重定向到个人资料页面
+        success_url='profile/'  # 假设密码更改成功后重定向到个人资料页面
     ), name='change_password'),
 
-    path('posts/', views.CarPostListView.as_view(), name='carpost_list'),  # 显示所有帖子的列表
-    path('posts/new/', views.create_carpost, name='create_carpost'),
-    path('posts/<int:pk>/', views.carpost_detail, name='carpost_detail'),
+    path('profile/', view_profile, name='view_profile'),
+    path('community/carpost_list.html', views.CarPostListView.as_view(), name='carpost_list'),  # 显示所有帖子的列表
+    path('community/create_carpost.html', views.create_carpost, name='create_carpost'),
+    path('community/carpost_detail.html', views.carpost_detail, name='carpost_detail'),
 ]
