@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Transaction'
+    'django.contrib.gis',
+    'Transaction',
+    'community',
+    'home_page',
+    'car_wiki',
+    'account',
 ]
 
 MIDDLEWARE = [
