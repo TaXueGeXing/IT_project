@@ -1,10 +1,14 @@
+from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import D
 from . import models
 from .models import Article
 from .models import Comment
 from .models import Product
+
+
+
+def home(request):
+    return render(request, 'home.html')
 
 
 def homepage_view(request):
@@ -46,14 +50,13 @@ def search_product(request):
     result_products = None
     if request.method == 'GET':
         location = request.GET.get('location')
-        # distance_value = request.GET.get('distance')
         brand = request.GET.get('brand')
         car_model = request.GET.get('carModel')
         min_price = request.GET.get('min_price')
         max_price = request.GET.get('max_price')
+
         # 处理搜索结果
         result_products = models.Product.objects.filter(
-            # 根据实际情况调整筛选条件
             car_brand__icontains=brand,
             car__carModel__icontains=car_model,
             price__range=[min_price, max_price],
@@ -66,7 +69,7 @@ def search_product(request):
 
 def transaction_view(request):
     # 获取默认产品（根据实际情况调整）
-    default_products = models.Product.objects.filter(is_default=True).order_by('-click')[:5]
+    default_products = models.Product.objects.filter(is_default=True)
 
     # 获取搜索结果
     result_products = request.session.get('result_products', None)
@@ -77,3 +80,4 @@ def transaction_view(request):
 
     context = {'result_products': result_products}
     return render(request, 'transaction.html', context)
+
