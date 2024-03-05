@@ -70,9 +70,9 @@ def buy_product(request, product_id):
             order.Time = timezone.now()
             order.save()
             
-            return redirect('product_detail', product_id=product_id)
+            return redirect('order_contact', product_id=product_id)
         except Order.DoesNotExist:
-            return redirect('product_detail', product_id=product_id)
+            return redirect('order_contact', product_id=product_id)
     else:
         return render(request, 'buy_product.html', {'product_id': product_id})
 

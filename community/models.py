@@ -1,5 +1,5 @@
 from django.db import models
-from account.models import *
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Article(models.Model):
