@@ -34,6 +34,12 @@ class CreateProductViewTest(TestCase):
         print(post_data)
         # 发送POST请求
         for i in range(10):
+            post_data = {
+                'title': 'Test Product '+str(i),
+                'date': '2024-03-01',
+                'price': '20.00',
+                'description': 'This is a test product. '+str(i)
+            }
             response = self.client.post(reverse('create_product'), data=post_data)
 
         # 检查产品是否成功创建
@@ -74,4 +80,3 @@ class CreateProductViewTest(TestCase):
         response_text = response.content.decode()
         print(response_text)
 
-        
