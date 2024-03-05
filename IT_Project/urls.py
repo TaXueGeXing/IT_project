@@ -26,12 +26,12 @@ from .view import home_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+
+    path('', home_page, name='home_page'),
     path('home/', include('home_page.urls')),
     path('carwiki/', include('car_wiki.urls')),
     path('about-us/', about_us, name='about_us'),
-    path('', home_page, name='home_page'),
-    
+
     path('register/', auth_view.register, name='register'),
     path('login/', auth_view.user_login, name='login'),
     path('logout/', auth_view.user_logout, name='logout'),
@@ -43,4 +43,4 @@ urlpatterns = [
     path('article/<int:article_id>/reply/', views.create_reply, name='create_reply'),
 
     path('Transaction/', include('Transaction.urls')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
