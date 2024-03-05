@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Car, CarDetail
+from .models import Car, CarDetail,Image
 
 
 def car_wiki(request):
@@ -33,19 +33,23 @@ def search_car(request):
             Brand__icontains=brand,
             CarModel__icontains=car_model,
         )
+
         if result_car.exists():
-            car_id = result_car.first().carID
+            car_id = result_car.first().CarID
             return redirect('car_detail', car_id=car_id)
+        # 如果没有搜索结果停留
+        default_cars = Car.objects.filter(is_default=True).order_by('-create_time')[:5]
+        context = {'default_cars': default_cars}
+        return render(request, 'carwiki.html', context)
 
-    else:
-        result_car = None
-    request.session['result_car'] = result_car
-    return redirect('carwiki', result_car=result_car)
 
-
-def car_detail(request, car_id):
+def car_detail_view(request, car_id):
     # 获取特定汽车的信息
-    detail = get_object_or_404(CarDetail, carID=car_id)
-    # 重定向到 car_detail 视图
-    context = {'carDetail': detail}
+    car = get_object_or_404(Car, CarID=car_id)
+    # 获取关联的CarDetail对象
+    car_detail = get_object_or_404(CarDetail, Car=car)
+    # 获取关联的Image对象列表
+    images = Image.objects.filter(CarDetail=car_detail)
+
+    context = {'car': car, 'car_detail': car_detail, 'images': images, }
     return render(request, 'car_detail.html', context)
