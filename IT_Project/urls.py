@@ -20,16 +20,14 @@ from account import views as auth_view
 from community import views
 
 urlpatterns = [
-<<<<<<< HEAD
-=======
     path('admin/', admin.site.urls),
 
-    path('ranking/', views.home, name='home'),
-    path('carwiki/', views.carwiki, name='carwiki'),
-    path('search/car/', views.search_car, name='search_car'),
-    path('car_detail/<str:car_id>/', views.car_detail, name='car_detail'),
-    path('search/product/', views.search_product, name='search_product'),
-    path('about-us/', views.about_us, name='about_us'),
+    # path('ranking/', views.home, name='home'),
+    # path('carwiki/', views.carwiki, name='carwiki'),
+    # path('search/car/', views.search_car, name='search_car'),
+    # path('car_detail/<str:car_id>/', views.car_detail, name='car_detail'),
+    # path('search/product/', views.search_product, name='search_product'),
+    # path('about-us/', views.about_us, name='about_us'),
 
     path('register/', auth_view.register, name='register'),
     path('login/', auth_view.user_login, name='login'),
@@ -40,5 +38,4 @@ urlpatterns = [
     path('article/<int:article_id>/', views.article_detail, name='article_detail'),
     path('create/', views.create_article, name='create_article'),
     path('article/<int:article_id>/reply/', views.create_reply, name='create_reply')
->>>>>>> fbb90b3948fa0bb44226c9a576eea10eaf57c633
 ]
