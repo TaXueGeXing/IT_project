@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone  # Import timezone module
+from django.utils import timezone
 from .models import Article, Reply
 
 def article_list(request):
