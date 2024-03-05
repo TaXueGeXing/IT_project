@@ -3,36 +3,46 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import *
 from django.utils import timezone
+from django.http import HttpResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def create_product(request):
+    logger.debug("111111111111111111111111")
     if request.method == 'POST':
         title = request.POST.get('title')
         date = request.POST.get('date')
         price = request.POST.get('price')
         description = request.POST.get('description')
-        
+        # user = request.POST.get('user')
+
+        logger.debug(f"Received POST request to create product with title={title}, date={date}, price={price}, description={description}")
+
         # create Product
         product = Product.objects.create(
             Title=title,
             Date=date,
             Price=price,
             Description=description,
-            SellerID=request.user,
+            SellerID=request.user
         )
-        
-        # create Order (BuyerID will set up when Someone wanna to buy it)
+        logger.info(f"Product created successfully with title={title}, id={product.ProductID}")
+
+        # create Order
         order = Order.objects.create(
             BuyerID=None,
             SellerID=request.user,
             ProductID=product,
             Time=timezone.now(),
-            IsBanned=False,  # Defuat
-            IsFinished=False,  # Defuat
-            IsAgreed=False,  # Defuat
+            IsBanned=False,
+            IsFinished=False,
+            IsAgreed=False,
         )
-        
-        return redirect('product_detail', product_id=product.id)
+
+        logger.info(f"Order created successfully for product with id={product.ProductID}")
+        return redirect('create/', product_id=product.ProductID)
     else:
         return render(request, 'create_product.html')
 
