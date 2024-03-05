@@ -8,6 +8,7 @@ class Product(models.Model):
     Price = models.DecimalField(max_digits=10, decimal_places=2)
     Description = models.TextField()
     Title = models.CharField(max_length=100)
+    car = models.ForeignKey("Car", on_delete=models.PROTECT)
 
 class Order(models.Model):
     OrderID = models.AutoField(primary_key=True)

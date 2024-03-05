@@ -1,12 +1,12 @@
-from django.shortcuts import render
 from django.shortcuts import render, redirect
-from . import models
-
 from community.models import Article
 from community.models import Reply
 from Transaction.models import Product
 
-def home(request):
+
+
+
+def home_page(request):
     return render(request, 'home.html')
 
 
@@ -55,12 +55,12 @@ def search_product(request):
         max_price = request.GET.get('max_price')
 
         # 处理搜索结果
-        result_products = models.Product.objects.filter(
+        result_products = (Product.objects.filter(
             car_brand__icontains=brand,
             car__carModel__icontains=car_model,
             price__range=[min_price, max_price],
             location__icontains=location
-        )
+        ))
 
     # 将搜索结果传递给交易页面
     return redirect('transaction', result_products=result_products)
