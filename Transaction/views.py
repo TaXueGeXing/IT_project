@@ -16,17 +16,27 @@ def create_product(request):
         date = request.POST.get('date')
         price = request.POST.get('price')
         description = request.POST.get('description')
+
+        car_model = request.POST.get('car_model')
+        brand = request.POST.get('brand')
+        location = request.POST.get('location')
         # user = request.POST.get('user')
 
         logger.debug(f"Received POST request to create product with title={title}, date={date}, price={price}, description={description}")
 
+        car_c = Car.objects.create(
+            CarModel = car_model,
+            Brand = brand
+        )
         # create Product
         product = Product.objects.create(
             Title=title,
             Date=date,
             Price=price,
             Description=description,
-            SellerID=request.user
+            SellerID=request.user,
+            Location = location,
+            car = car_c
         )
         logger.info(f"Product created successfully with title={title}, id={product.ProductID}")
 
