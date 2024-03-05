@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import D
 from . import models
 from .models import Article
-from .models import Comment
+from .models import Reply
 from .models import Product
+
+
+
+def home(request):
+    return render(request, 'home.html')
 
 
 def homepage_view(request):
@@ -13,9 +16,9 @@ def homepage_view(request):
     # 调用首页文章和讨论区 'Discussion & Articles': 'Some other data'
     top_article = Article.objects.order_by('-clicks').first
     # 实时滚动评论区
-    recent_comments = Comment.objects.order_by('-create_time')[:5]
+    recent_replies = Reply.objects.order_by('-create_time')[:5]
     # 传递排名信息和其他信息到首页
-    context = {'Best-Selling products': top_five_models, 'Articles': top_article, 'Discussion': recent_comments}
+    context = {'Best-Selling products': top_five_models, 'Articles': top_article, 'Discussion': recent_replies}
     if request.method == 'POST':
         # 调用 search_product 处理搜索，并将结果存储在 session 中
         search_product(request)
@@ -46,14 +49,13 @@ def search_product(request):
     result_products = None
     if request.method == 'GET':
         location = request.GET.get('location')
-        # distance_value = request.GET.get('distance')
         brand = request.GET.get('brand')
         car_model = request.GET.get('carModel')
         min_price = request.GET.get('min_price')
         max_price = request.GET.get('max_price')
+
         # 处理搜索结果
         result_products = models.Product.objects.filter(
-            # 根据实际情况调整筛选条件
             car_brand__icontains=brand,
             car__carModel__icontains=car_model,
             price__range=[min_price, max_price],
@@ -66,7 +68,7 @@ def search_product(request):
 
 def transaction_view(request):
     # 获取默认产品（根据实际情况调整）
-    default_products = models.Product.objects.filter(is_default=True).order_by('-click')[:5]
+    default_products = models.Product.objects.filter(is_default=True)
 
     # 获取搜索结果
     result_products = request.session.get('result_products', None)
