@@ -1,4 +1,11 @@
-from django.shortcuts import render, redirect
+from car_wiki import models
+from car_wiki.models import Car
+from django.shortcuts import render, redirect, get_object_or_404
+
+
+def car_wiki(request):
+    return render(request, 'carwiki.html')
+
 
 def carwiki_view(request):
     # 获取默认产品（最新发布的五种车）
@@ -28,10 +35,18 @@ def search_car(request):
             car_model__icontains=car_model,
         )
         if result_car.exists():
-            car_id = result_car.first().carID
+            car_id = result_car.carID
             return redirect('car_detail', car_id=car_id)
 
     else:
         result_car = None
     request.session['result_car'] = result_car
     return redirect('carwiki', result_car=result_car)
+
+
+def car_detail(request, car_id):
+    # 获取特定汽车的信息
+    car = get_object_or_404(Car, carID=car_id)
+    # 重定向到 car_detail 视图
+    context = {'car': car}
+    return render(request, 'car_detail.html', context)
