@@ -35,7 +35,7 @@ def search_car(request):
             car_model__icontains=car_model,
         )
         if result_car.exists():
-            car_id = result_car.carID
+            car_id = result_car.first().carID
             return redirect('car_detail', car_id=car_id)
 
     else:
@@ -50,4 +50,3 @@ def car_detail(request, car_id):
     # 重定向到 car_detail 视图
     context = {'car': car}
     return render(request, 'car_detail.html', context)
-

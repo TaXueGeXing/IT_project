@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from . import models
 from .models import Article
-from .models import Comment
+from .models import Reply
 from .models import Product
 
 
@@ -17,9 +17,9 @@ def homepage_view(request):
     # 调用首页文章和讨论区 'Discussion & Articles': 'Some other data'
     top_article = Article.objects.order_by('-clicks').first
     # 实时滚动评论区
-    recent_comments = Comment.objects.order_by('-create_time')[:5]
+    recent_replies = Reply.objects.order_by('-create_time')[:5]
     # 传递排名信息和其他信息到首页
-    context = {'Best-Selling products': top_five_models, 'Articles': top_article, 'Discussion': recent_comments}
+    context = {'Best-Selling products': top_five_models, 'Articles': top_article, 'Discussion': recent_replies}
     if request.method == 'POST':
         # 调用 search_product 处理搜索，并将结果存储在 session 中
         search_product(request)
