@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-
 from .models import Car, CarDetail,Image
 
 
@@ -39,8 +38,8 @@ def search_car(request):
             car_id = result_car.first().CarID
             return redirect('car_detail', car_id=car_id)
         # 如果没有搜索结果停留
-        all_cars = Car.objects.all()
-        context = {'all_cars': all_cars}
+        default_cars = Car.objects.filter(is_default=True).order_by('-create_time')[:5]
+        context = {'default_cars': default_cars}
         return render(request, 'carwiki.html', context)
 
 
