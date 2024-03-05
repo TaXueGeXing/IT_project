@@ -1,6 +1,5 @@
-from car_wiki import models
-from car_wiki.models import Car
 from django.shortcuts import render, redirect, get_object_or_404
+from .models import Car, CarDetail
 
 
 def car_wiki(request):
@@ -9,7 +8,7 @@ def car_wiki(request):
 
 def carwiki_view(request):
     # 获取默认产品（最新发布的五种车）
-    default_cars = models.Car.objects.filter(is_default=True).order_by('-create_time')[:5]
+    default_cars = Car.objects.filter(is_default=True).order_by('-create_time')[:5]
     # 获取搜索结果
     result_car = request.session.get('result_car', None)
 
@@ -25,14 +24,14 @@ def carwiki_view(request):
 def search_car(request):
     # 处理搜索请求
     if request.method == 'GET':
-        brand = request.GET.get('brand')
-        car_model = request.GET.get('car_model')
+        brand = request.GET.get('Brand')
+        car_model = request.GET.get('CarModel')
 
         # 处理搜索结果
-        result_car = models.Car.objects.filter(
+        result_car = Car.objects.filter(
             # 根据实际情况调整筛选条件
-            brand__icontains=brand,
-            car_model__icontains=car_model,
+            Brand__icontains=brand,
+            CarModel__icontains=car_model,
         )
         if result_car.exists():
             car_id = result_car.first().carID
@@ -46,7 +45,7 @@ def search_car(request):
 
 def car_detail(request, car_id):
     # 获取特定汽车的信息
-    car = get_object_or_404(Car, carID=car_id)
+    car_detail = get_object_or_404(CarDetail, carID=car_id)
     # 重定向到 car_detail 视图
-    context = {'car': car}
+    context = {'carDetail': car_detail}
     return render(request, 'car_detail.html', context)

@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect
 from community.models import Article
 from community.models import Reply
-from Transaction.models import Product
-
-
+from Transaction.models import Product, Order
 
 
 def home_page(request):
@@ -48,18 +46,18 @@ def search_product(request):
     # 处理搜索请求
     result_products = None
     if request.method == 'GET':
-        location = request.GET.get('location')
-        brand = request.GET.get('brand')
+        location = request.GET.get('Location')
+        brand = request.GET.get('Brand')
         car_model = request.GET.get('carModel')
-        min_price = request.GET.get('min_price')
-        max_price = request.GET.get('max_price')
+        min_price = request.GET.get('Min_Price')
+        max_price = request.GET.get('Max_Price')
 
         # 处理搜索结果
         result_products = (Product.objects.filter(
-            car_brand__icontains=brand,
+            car__Brand__icontains=brand,
             car__carModel__icontains=car_model,
-            price__range=[min_price, max_price],
-            location__icontains=location
+            Price__range=[min_price, max_price],
+            Location__icontains=location
         ))
 
     # 将搜索结果传递给交易页面
@@ -67,9 +65,12 @@ def search_product(request):
 
 
 def transaction_view(request):
-    # 获取默认产品（根据实际情况调整）
-    default_products = Product.objects.filter(is_default=True)
-
+    # 获取默认产品（未出售的）
+    default_products = Product.objects.filter(
+        Order__is_finished=False,
+        Order__is_banned=False,
+        Order__buyer_id=None
+    ).distinct()
     # 获取搜索结果
     result_products = request.session.get('result_products', None)
 
@@ -79,4 +80,5 @@ def transaction_view(request):
 
     context = {'result_products': result_products}
     return render(request, 'transaction.html', context)
+
 
