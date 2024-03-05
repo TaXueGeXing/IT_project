@@ -42,14 +42,16 @@ def create_product(request):
         )
 
         logger.info(f"Order created successfully for product with id={product.ProductID}")
-        return redirect('create/', product_id=product.ProductID)
+        return redirect('pending_orders/', product_id=product.ProductID)
     else:
         return render(request, 'create_product.html')
 
 def view_pending_orders(request):
     # IsFinished=False(Not be selled), IsBanned=False(not be baned), BuyerID=None(No one wanna buy is now)
     pending_orders = Order.objects.filter(IsFinished=False, IsBanned=False, BuyerID=None)
-    return render(request, 'pending_orders.html', {'pending_orders': pending_orders})
+    response_content = 'Pending orders: {}'.format(pending_orders)
+    return HttpResponse(response_content)
+    # return render(request, 'pending_orders.html', {'pending_orders': pending_orders})
 
 @login_required
 def buy_product(request, product_id):
@@ -68,9 +70,9 @@ def buy_product(request, product_id):
             order.Time = timezone.now()
             order.save()
             
-            return redirect('product_detail', product_id=product_id)
+            return redirect('order_contact', product_id=product_id)
         except Order.DoesNotExist:
-            return redirect('product_detail', product_id=product_id)
+            return redirect('order_contact', product_id=product_id)
     else:
         return render(request, 'buy_product.html', {'product_id': product_id})
 

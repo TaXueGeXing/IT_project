@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect
 from . import models
-from .models import Article
-from .models import Reply
-from .models import Product
 
-
+from community.models import Article
+from community.models import Reply
+from Transaction.models import Product
 
 def home(request):
     return render(request, 'home.html')
@@ -69,7 +68,7 @@ def search_product(request):
 
 def transaction_view(request):
     # 获取默认产品（根据实际情况调整）
-    default_products = models.Product.objects.filter(is_default=True)
+    default_products = Product.objects.filter(is_default=True)
 
     # 获取搜索结果
     result_products = request.session.get('result_products', None)
