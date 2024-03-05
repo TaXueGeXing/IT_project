@@ -45,7 +45,7 @@ def search_car(request):
 
 def car_detail(request, car_id):
     # 获取特定汽车的信息
-    car_detail = get_object_or_404(CarDetail, carID=car_id)
+    detail = get_object_or_404(CarDetail, carID=car_id)
     # 重定向到 car_detail 视图
-    context = {'carDetail': car_detail}
+    context = {'carDetail': detail}
     return render(request, 'car_detail.html', context)

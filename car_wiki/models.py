@@ -8,8 +8,12 @@ class Car(models.Model):
 
 
 class CarDetail(models.Model):
-    Car = models.OneToOneField(Car, on_delete=models.PROTECT, primary_key=True)
+    Car = models.OneToOneField(Car, on_delete=models.PROTECT, related_name='car_detail', primary_key=True)
     Define = models.CharField(max_length=30)
-    Image = models.ImageField(upload_to='images', blank=True, null=True)
+
+
+class Image(models.Model):
+    CarDetail = models.ForeignKey(CarDetail, on_delete=models.CASCADE, related_name='images')
+    picture = models.ImageField(upload_to='images', blank=True, null=True)
 
 

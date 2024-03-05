@@ -48,14 +48,14 @@ def search_product(request):
     if request.method == 'GET':
         location = request.GET.get('Location')
         brand = request.GET.get('Brand')
-        car_model = request.GET.get('carModel')
+        car_model = request.GET.get('Model')
         min_price = request.GET.get('Min_Price')
         max_price = request.GET.get('Max_Price')
 
         # 处理搜索结果
         result_products = (Product.objects.filter(
             car__Brand__icontains=brand,
-            car__carModel__icontains=car_model,
+            car__CarModel__icontains=car_model,
             Price__range=[min_price, max_price],
             Location__icontains=location
         ))
