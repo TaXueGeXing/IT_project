@@ -64,3 +64,14 @@ class CreateProductViewTest(TestCase):
             print("Is Agreed:", order.IsAgreed)
             print("Email:", order.SellerID.email)
             print()  # 添加一个空行以提高可读性
+        
+        response = self.client.get(reverse('pending_orders'))
+
+        # 检查响应状态码
+        self.assertEqual(response.status_code, 200)
+        # 检查响应内容是否包含预期的字符串
+        self.assertIn('Pending orders:', response.content.decode())
+        response_text = response.content.decode()
+        print(response_text)
+
+        
