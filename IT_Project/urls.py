@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from account import views as auth_view
+from community import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +28,14 @@ urlpatterns = [
     path('car_detail/<str:car_id>/', views.car_detail, name='car_detail'),
     path('search/product/', views.search_product, name='search_product'),
     path('about-us/', views.about_us, name='about_us'),
+
+    path('register/', auth_view.register, name='register'),
+    path('login/', auth_view.user_login, name='login'),
+    path('logout/', auth_view.user_logout, name='logout'),
+    path('edit-profile/', auth_view.edit_profile, name='edit_profile'),
+    path('order-history/', auth_view.view_order_history, name='order_history'),
+    path('community/', views.article_list, name='article_list'),
+    path('article/<int:article_id>/', views.article_detail, name='article_detail'),
+    path('create/', views.create_article, name='create_article'),
+    path('article/<int:article_id>/reply/', views.create_reply, name='create_reply')
 ]
