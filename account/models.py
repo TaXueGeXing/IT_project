@@ -8,3 +8,4 @@ class User(models.Model):
     Email = models.EmailField()
     PhoneNo = models.IntegerField()
     Picture = models.ImageField()
+    last_login = models.DateTimeField(auto_now=True)
