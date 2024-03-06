@@ -32,15 +32,7 @@ urlpatterns = [
     path('carwiki/', include('car_wiki.urls')),
     path('about-us/', about_us, name='about_us'),
 
-    path('register/', auth_view.register, name='register'),
-    path('login/', auth_view.user_login, name='login'),
-    path('logout/', auth_view.user_logout, name='logout'),
-    path('edit-profile/', auth_view.edit_profile, name='edit_profile'),
-    path('order-history/', auth_view.view_order_history, name='order_history'),
-    path('community/', views.article_list, name='article_list'),
-    path('article/<int:article_id>/', views.article_detail, name='article_detail'),
-    path('create/', views.create_article, name='create_article'),
-    path('article/<int:article_id>/reply/', views.create_reply, name='create_reply'),
-
+    path('account/', include('account.urls')),
+    path('community/', include('community.urls')),
     path('Transaction/', include('Transaction.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
