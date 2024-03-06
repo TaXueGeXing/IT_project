@@ -85,3 +85,20 @@ class CreateProductViewTest(TestCase):
         response_text = response.content.decode()
         print(response_text)
 
+        if self.client.session.get('_auth_user_id'):
+            print("User is logged in.")
+        else:
+            print("User is not logged in.")
+            
+        response = self.client.get(reverse('buy_product', args=(product.ProductID,)))
+
+        print("Order ID:", order.OrderID)
+        print("Buyer ID:", order.BuyerID)
+        print("Seller ID:", order.SellerID.username)
+        print("Product Title:", order.ProductID.Title)
+        print("Time:", order.Time)
+        print("Is Banned:", order.IsBanned)
+        print("Is Finished:", order.IsFinished)            
+        print("Is Agreed:", order.IsAgreed)
+        print("Email:", order.SellerID.email)
+
