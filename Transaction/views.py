@@ -23,11 +23,15 @@ def create_product(request):
         # user = request.POST.get('user')
 
         logger.debug(f"Received POST request to create product with title={title}, date={date}, price={price}, description={description}")
+        
+        try:
+            Car.objects.get(CarModel = car_model)
+        except:
+            car_c = Car.objects.create(
+                CarModel = car_model,
+                Brand = brand
+            )
 
-        car_c = Car.objects.create(
-            CarModel = car_model,
-            Brand = brand
-        )
         # create Product
         product = Product.objects.create(
             Title=title,
@@ -66,24 +70,26 @@ def view_pending_orders(request):
 @login_required
 def buy_product(request, product_id):
     if request.method == 'POST':
+        logger.debug(f"buy_product_now")
 
         # get informations
         buyer = request.user
         product = Product.objects.get(id=product_id)
         
-        try:
+        # try:
             # check the order
-            order = Order.objects.get(ProductID=product, BuyerID=None)
+        order = Order.objects.get(ProductID=product_id, BuyerID=None)
             
-            # update it
-            order.BuyerID = buyer
-            order.Time = timezone.now()
-            order.save()
+        # update it
+        order.BuyerID = buyer
+        order.Time = timezone.now()
+        order.save()
             
-            return redirect('order_contact', product_id=product_id)
-        except Order.DoesNotExist:
-            return redirect('product_detail', product_id=product_id)
+        return redirect('order_contact', product_id=product_id)
+        # except Order.DoesNotExist:
+        #     return redirect('order_contact', product_id=product_id)
     else:
+        return HttpResponse()
         return render(request, 'buy_product.html', {'product_id': product_id})
 
 
