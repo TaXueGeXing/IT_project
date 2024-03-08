@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 from .models import Product, Order, Car
 from django.contrib.auth.models import User
@@ -11,7 +12,7 @@ class ProductListCreateAPIViewTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user = User.objects.create(username='testuser', password='testpass')
         self.car_t = Car.objects.create(car_brand='Toyota', car_model='Camry')
         self.product = Product.objects.create(
             Title='Test Product',
@@ -22,6 +23,15 @@ class ProductListCreateAPIViewTests(TestCase):
             car=self.car_t,
             Location='Product Location'
         )
+        self.order = Order.objects.create(
+            BuyerID=None,
+            SellerID=self.user,
+            ProductID=self.product,
+            Time=timezone.now(),
+            IsBanned=False,
+            IsFinished=False,
+            IsAgreed=False,
+        )
 
     def test_product_list_anonymous_user(self):
         url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
@@ -29,6 +39,7 @@ class ProductListCreateAPIViewTests(TestCase):
         print(response)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
+        #print(response.data)
 
     def test_product_list_authenticated_user(self):
         self.client.force_authenticate(user=self.user)
@@ -36,6 +47,7 @@ class ProductListCreateAPIViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
+        #print(response.data)
 
     def test_product_create_anonymous_user(self):
         url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
@@ -57,16 +69,33 @@ class ProductListCreateAPIViewTests(TestCase):
         url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
         data = {
             'Title': 'New Product',
-            'SellerID': self.user,
             'Date': '2023-01-03',
             'Price': '20.00',
             'Description': 'A description of the new product',
-            'car': self.car_t, 
-            'Location': 'New Product Location'
+            'Location': 'New Product Location',
+            'car_brand': 'Toyota',
+            'car_model': 'Camry'
         }
-        serializer = ProductSerializer(data)
-        print(serializer.is_valid())
+        # serializer = ProductSerializer(data)
+        # print(serializer.is_valid())
         response = self.client.post(url, data)
         print(response.context)
-        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # self.assertEqual(len(Product.objects.all()), 2)
+        products = Product.objects.all()
+        for product in products:
+            # 在这里对产品对象进行操作
+            print(product.ProductID)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(Product.objects.all()), 2)
+        orders = Order.objects.all()
+        for order in orders:
+            # 在这里对产品对象进行操作
+            print(order.OrderID)
+
+    def test_buy_product_authenticated_user(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('buy_product', kwargs={'product': self.product.pk})  # 使用 reverse() 函数生成 URL 路径，传入产品的主键
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # 现在可以对购买后的行为进行检查，比如检查订单是否已经创建等等
+        self.assertTrue(Order.objects.filter(BuyerID=self.user, ProductID=self.product).exists())
+
