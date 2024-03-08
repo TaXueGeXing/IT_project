@@ -1,23 +1,11 @@
 # views.py
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Product, Order, Car
 from .serializers import ProductSerializer, OrderSerializer
-
-import logging
-logger = logging.getLogger(__name__)
-# 创建格式化程序
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# 创建控制台处理程序并设置日志级别和格式
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-console_handler.setFormatter(formatter)
-
-# 添加处理程序到logger
-logger.addHandler(console_handler)
 
 
 class ProductListCreateAPIView(APIView):
@@ -31,32 +19,50 @@ class ProductListCreateAPIView(APIView):
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        serializer = ProductSerializer(data=request.data)
-        logger.debug(request.data)
-        if serializer.is_valid():
-            serializer.save(SellerID=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+        car = Car.objects.create(
+            car_brand = request.POST.get('car_brand'),
+            car_model = request.POST.get('car_model')
+        )
 
-class OrderListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+        product = Product.objects.create(
+            Title = request.POST.get('Title'),
+            Date = request.POST.get('Date'),
+            Price = request.POST.get('Price'),
+            Description = request.POST.get('Description'),
+            Location = request.POST.get('Location'),
+            SellerID = request.user,
+            car = car
+        )
+        product.SellerID = request.user
+        order = Order.objects.create(
+            BuyerID=None,
+            SellerID=request.user,
+            ProductID=product,
+            Time=timezone.now(),
+            IsBanned=False,
+            IsFinished=False,
+            IsAgreed=False,
+        )
+        # serializer = ProductSerializer(data=request.data)
+        # logger.debug(request.data)
+        # if serializer.is_valid():
+        #     serializer.save(SellerID=request.user)
+        return Response(status=status.HTTP_201_CREATED)
 
-    def get(self, request, format=None):
-        orders = Order.objects.filter(IsFinished=False, IsBanned=False, BuyerID=None)
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
-            buyer = request.user
-            product = serializer.validated_data['ProductID']
-            if product.SellerID != buyer and not Order.objects.filter(ProductID=product, BuyerID=buyer).exists():
-                serializer.save(BuyerID=buyer)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response({'error': 'You cannot create an order for this product.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class BuyProductAPIView(APIView):
+    def post(self, request, product, format=None):
+        self.permission_classes = [IsAuthenticated]
+        if not request.user.is_authenticated:
+            return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
+        order = Order.objects.filter(ProductID = product)
+        order.BuyerID = request.user
+        # serializer = ProductSerializer(data=request.data)
+        # logger.debug(request.data)
+        # if serializer.is_valid():
+        #     serializer.save(SellerID=request.user)
+        return Response(status=status.HTTP_201_CREATED)
 
 # 更多视图...
 
