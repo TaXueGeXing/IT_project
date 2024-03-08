@@ -1,87 +1,74 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
 from Transaction.models import Order
-from django.contrib.auth.hashers import check_password
+from .serializers import UserRegisterSerializer, UserProfileSerializer
+from Transaction.serializers import OrderSerializer
 
+# 用户注册
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def register(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        email = request.POST.get('email')
+    serializer = UserRegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'message': 'User created successfully', 'token': token.key}, status=201)
+    return Response(serializer.errors, status=400)
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists.')
-            return render(request, 'register.html')
-        elif User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already registered.')
-            return render(request, 'register.html')
+# Token 认证的登录视图
+class TokenLoginView(APIView):
+    permission_classes = [AllowAny]
 
-        user = User.objects.create_user(username=username, password=password, email=email)
-        user.save()
-        messages.success(request, 'Account created successfully! Please log in.')
-        return redirect('login')
-    else:
-        return render(request, 'register.html')
-
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('user_profile')
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key})
         else:
-            messages.error(request, 'Invalid username or password')
-            return render(request, 'login.html')
-    else:
-        return render(request, 'login.html')
+            return Response({'error': 'Invalid username or password'}, status=400)
 
-@login_required
+# 用户登出
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def user_logout(request):
-    logout(request)
-    return redirect('login')
+    request.user.auth_token.delete()
+    return Response({'message': 'Successfully logged out.'}, status=204)
 
-@login_required
-def user_profile(request):
+# 修改密码
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
     user = request.user
-    if request.method == 'POST':
-        # 更改密码操作
-        if 'change_password' in request.POST:
-            old_password = request.POST.get('old_password')
-            new_password1 = request.POST.get('new_password1')
-            new_password2 = request.POST.get('new_password2')
+    old_password = request.data.get('old_password')
+    new_password = request.data.get('new_password')
 
-            if not check_password(old_password, user.password):
-                messages.error(request, "Old password is incorrect.")
-            elif new_password1 != new_password2:
-                messages.error(request, "New passwords do not match.")
-            else:
-                user.set_password(new_password1)
-                user.save()
-                messages.success(request, "Your password was successfully updated!")
+    if not user.check_password(old_password):
+        return Response({'error': 'Old password is incorrect.'}, status=400)
 
-        # 更新个人资料操作（示例：更改用户名）
-        elif 'update_profile' in request.POST:
-            # 假设表单提交的是个人资料更新
-            new_username = request.POST.get('username', user.username)
-            new_email = request.POST.get('email', user.email)
-            # 简单的数据验证逻辑
-            if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
-                messages.error(request, 'Username already taken.')
-            elif User.objects.filter(email=new_email).exclude(pk=user.pk).exists():
-                messages.error(request, 'Email already registered.')
-            else:
-                user.username = new_username
-                user.email = new_email
-                user.save()
-                messages.success(request, 'Profile updated successfully.')
-        # 这里不重定向，以便在更新资料后保持在同一页，并显示更新结果
+    user.set_password(new_password)
+    user.save()
+    return Response({'message': 'Password updated successfully.'}, status=200)
 
-        # 获取订单历史
-        elif 'order_history' in request.POST:
-            orders = Order.objects.filter(BuyerID=user)
-            return render(request, 'user_dashboard.html', {'orders': orders})
+# 更新个人资料
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Profile updated successfully'})
+    return Response(serializer.errors, status=400)
+
+# 查看订单历史
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def order_history(request):
+    orders = Order.objects.filter(BuyerID=request.user)
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
