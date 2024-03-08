@@ -2,14 +2,14 @@ from django.db import models
 
 
 class Car(models.Model):
-    CarID = models.AutoField(primary_key=True)
-    CarModel = models.CharField(max_length=30)
-    Brand = models.CharField(max_length=30)
+    car_id = models.AutoField(primary_key=True)
+    car_model = models.CharField(max_length=30)
+    car_brand = models.CharField(max_length=30)
 
 
 class CarDetail(models.Model):
-    Car = models.OneToOneField(Car, on_delete=models.PROTECT, related_name='car_detail', primary_key=True)
-    Define = models.CharField(max_length=30)
+    car = models.OneToOneField(Car, on_delete=models.PROTECT, related_name='car_detail', primary_key=True)
+    define = models.TextField()
 
 
 class Image(models.Model):
