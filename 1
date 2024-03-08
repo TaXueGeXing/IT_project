@@ -1,0 +1,67 @@
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth.decorators import login_required
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from .models import Order
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, permission_classes
+
+# 用户注册
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    if request.method == 'POST':
+        username = request.data.get('username')
+        password = request.data.get('password')
+        email = request.data.get('email')
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists'}, status=400)
+        user = User.objects.create_user(username=username, password=password, email=email)
+        return Response({'message': 'User created successfully'}, status=201)
+    return Response({'error': 'Invalid Request'}, status=400)
+
+# Token 认证的登录视图
+class TokenLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key})
+        else:
+            return Response({'error': 'Invalid username or password'}, status=400)
+
+# 用户登出
+@api_view(['POST'])
+def user_logout(request):
+    request.user.auth_token.delete()
+    return Response({'message': 'Successfully logged out.'}, status=204)
+
+# 编辑个人资料
+@api_view(['POST'])
+@login_required
+def edit_profile(request):
+    user = request.user
+    username = request.data.get('username', user.username)
+    email = request.data.get('email', user.email)
+    # 更新用户信息
+    user.username = username
+    user.email = email
+    user.save()
+    return Response({'message': 'Profile updated successfully'})
+
+# 查看订单历史
+@api_view(['GET'])
+@login_required
+def order_history(request):
+    orders = Order.objects.filter(BuyerID=request.user).values()
+    return Response(list(orders))
+
+# 请确保您的 urls.py 文件包含对这些视图的引用
