@@ -8,7 +8,7 @@ class Car(models.Model):
 
 
 class CarDetail(models.Model):
-    car = models.OneToOneField(Car, on_delete=models.PROTECT, related_name='car_detail', primary_key=True)
+    car = models.OneToOneField(Car, on_delete=models.PROTECT, related_name='car_detail')
     define = models.TextField()
 
 
