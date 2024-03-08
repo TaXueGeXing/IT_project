@@ -13,7 +13,7 @@ class CarDetail(models.Model):
 
 
 class Image(models.Model):
-    CarDetail = models.ForeignKey(CarDetail, on_delete=models.CASCADE, related_name='images')
+    car_detail = models.ForeignKey(CarDetail, on_delete=models.CASCADE, related_name='images', to_field='car_id')
     picture = models.ImageField(upload_to='images', blank=True, null=True)
 
 
