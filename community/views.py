@@ -13,9 +13,9 @@ tag_data = {
 }
 
 # Create tags with categories
-for category, tags in tag_data.items():
-    for tag_name in tags:
-        Tag.objects.get_or_create(name=tag_name, category=category)
+# for category, tags in tag_data.items():
+#     for tag_name in tags:
+#         Tag.objects.get_or_create(name=tag_name, category=category)
 
 
 def community(request):

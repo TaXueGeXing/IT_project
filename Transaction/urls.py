@@ -1,11 +1,10 @@
 from django.urls import path
-from . import views
+from Transaction.views import ProductListCreateAPIView, OrderListCreateAPIView
+
 
 urlpatterns = [
-    path('create/', views.create_product, name='create_product'),
-    path('pending_orders/', views.view_pending_orders, name='pending_orders'),
-    path('buy_product/<int:product_id>/', views.buy_product, name='buy_product'),
-    path('order_contact/<int:order_id>/', views.view_order_contact, name='order_contact'),
-    path('complete_order/<int:order_id>/', views.complete_order, name='complete_order'),
-    # Add more URL patterns as needed
+    # API视图
+    path('api/products/', ProductListCreateAPIView.as_view(), name='product_list_create'),
+    path('api/orders/', OrderListCreateAPIView.as_view(), name='order_list_create'),
 ]
+
