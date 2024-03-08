@@ -1,6 +1,8 @@
 from django.urls import path
-from . import views
+from .views import homepage_view, search_product, ranking
+
 urlpatterns = [
-    path('ranking/', views.ranking, name='home'),
-    path('search/product/', views.search_product, name='search_product'),
+    path('homepage/', homepage_view, name='homepage'),
+    path('search/product/', search_product, name='search_product'),
+    path('ranking/', ranking, name='home'),
 ]
