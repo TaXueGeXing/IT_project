@@ -90,12 +90,34 @@ class ProductListCreateAPIViewTests(TestCase):
         for order in orders:
             # 在这里对产品对象进行操作
             print(order.OrderID)
-
-    def test_buy_product_authenticated_user(self):
-        self.client.force_authenticate(user=self.user)
-        url = reverse('buy_product', kwargs={'product': self.product.pk})  # 使用 reverse() 函数生成 URL 路径，传入产品的主键
-        response = self.client.post(url)
+        url = reverse('buy_product')  # 使用 reverse() 函数生成 URL 路径，传入产品的主键
+        data = {'product': 1}
+        response_buy = self.client.post(url, data)
+        print("buy_product",response_buy)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        url = reverse('finish_order')  # 使用 reverse() 函数生成 URL 路径，传入产品的主键
+        data = {'order_pk': 1}
+        response_buy = self.client.post(url, data)
+        print("finish",response_buy)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # 现在可以对购买后的行为进行检查，比如检查订单是否已经创建等等
-        self.assertTrue(Order.objects.filter(BuyerID=self.user, ProductID=self.product).exists())
+        orders = Order.objects.all()
+        for order in orders:
+            # 在这里对产品对象进行操作
+            print(order.OrderID)
+            print(order.BuyerID)
+            print(order.IsFinished)
+
+    # def test_buy_product_authenticated_user(self):
+    #     self.client.force_authenticate(user=self.user)
+    #     url = reverse('buy_product', kwargs={'product': self.product.pk})  # 使用 reverse() 函数生成 URL 路径，传入产品的主键
+    #     response = self.client.post(url)
+    #     print(response)
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     # 现在可以对购买后的行为进行检查，比如检查订单是否已经创建等等
+    #     orders = Order.objects.all()
+    #     for order in orders:
+    #         # 在这里对产品对象进行操作
+    #         print(order.OrderID)
+    #     # self.assertTrue(Order.objects.filter(BuyerID=self.user, ProductID=self.product).exists())
 

@@ -35,6 +35,7 @@ class ProductListCreateAPIView(APIView):
             car = car
         )
         product.SellerID = request.user
+        product.save()
         order = Order.objects.create(
             BuyerID=None,
             SellerID=request.user,
@@ -52,18 +53,34 @@ class ProductListCreateAPIView(APIView):
 
 
 class BuyProductAPIView(APIView):
-    def post(self, request, product, format=None):
+    def post(self, request, format=None):
         self.permission_classes = [IsAuthenticated]
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
-        order = Order.objects.filter(ProductID = product)
+        product = request.POST.get('product')
+        order = Order.objects.get(ProductID = product)
         order.BuyerID = request.user
+        order.save()
         # serializer = ProductSerializer(data=request.data)
         # logger.debug(request.data)
         # if serializer.is_valid():
         #     serializer.save(SellerID=request.user)
         return Response(status=status.HTTP_201_CREATED)
 
+class FinishOrderAPIView(APIView):
+    def post(self, request, format=None):
+        self.permission_classes = [IsAuthenticated]
+        if not request.user.is_authenticated:
+            return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
+        order_pk = request.POST.get('order_pk')
+        order = Order.objects.get(OrderID = order_pk)
+        order.IsFinished = True
+        order.save()
+        # serializer = ProductSerializer(data=request.data)
+        # logger.debug(request.data)
+        # if serializer.is_valid():
+        #     serializer.save(SellerID=request.user)
+        return Response(status=status.HTTP_201_CREATED)
 # 更多视图...
 
 
