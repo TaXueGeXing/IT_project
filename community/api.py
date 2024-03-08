@@ -1,12 +1,13 @@
-from rest_framework import serializers
-from .models import Article,Reply
+from rest_framework import viewsets
+from .models import Article, Reply
+from .serializers import ArticleSerializer, ReplySerializer
 
-class ArticleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Article
-        fields = '__all__'
 
-class ReplySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Reply
-        fields = '__all__'
+class ArticleViewSet(viewsets.ModelViewSet):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+
+
+class ReplyViewSet(viewsets.ModelViewSet):
+    queryset = Reply.objects.all()
+    serializer_class = ReplySerializer
