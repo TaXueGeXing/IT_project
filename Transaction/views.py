@@ -34,6 +34,7 @@ class ProductListCreateAPIView(APIView):
             SellerID = request.user,
             car = car
         )
+        
         product.SellerID = request.user
         product.save()
         order = Order.objects.create(
