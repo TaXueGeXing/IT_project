@@ -1,19 +1,12 @@
 from rest_framework import serializers
-from .models import Car, CarDetail, Image
-
-
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ('picture',)
+from .models import Car, CarDetail
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = CarDetail
-        fields = ('define', 'images')
+        fields = ('define', 'picture')
 
 
 class CarSerializer(serializers.ModelSerializer):
