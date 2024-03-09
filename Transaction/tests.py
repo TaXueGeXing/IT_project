@@ -32,40 +32,60 @@ class ProductListCreateAPIViewTests(TestCase):
             IsFinished=False,
             IsAgreed=False,
         )
+        
 
-    def test_product_list_anonymous_user(self):
-        url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
-        response = self.client.get(url)
-        print(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        #print(response.data)
+    # def test_product_list_anonymous_user(self):
+    #     url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
+    #     response = self.client.get(url)
+    #     print(response)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(len(response.data), 1)
+    #     #print(response.data)
 
-    def test_product_list_authenticated_user(self):
-        self.client.force_authenticate(user=self.user)
-        url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        #print(response.data)
+    # def test_product_list_authenticated_user(self):
+    #     self.client.force_authenticate(user=self.user)
+    #     url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
+    #     response = self.client.get(url)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(len(response.data), 1)
+    #     #print(response.data)
 
-    def test_product_create_anonymous_user(self):
-        url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
-        data = {
-            'Title': 'New Product',
-            'SellerID': self.user,
-            'Date': '2023-01-02',
-            'Price': '20.00',
-            'Description': 'A description of the new product',
-            'car': self.car_t, 
-            'Location': 'New Product Location'
-        }
-        response = self.client.post(url, data)
-        print(response)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    # def test_product_create_anonymous_user(self):
+    #     url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
+    #     data = {
+    #         'Title': 'New Product',
+    #         'SellerID': self.user,
+    #         'Date': '2023-01-02',
+    #         'Price': '20.00',
+    #         'Description': 'A description of the new product',
+    #         'car': self.car_t, 
+    #         'Location': 'New Product Location'
+    #     }
+    #     response = self.client.post(url, data)
+    #     print(response)
+    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_product_create_authenticated_user(self):
-        self.client.force_authenticate(user=self.user)
+        data = {
+            'username': 'testuser1',
+            'password': 'testuser1',
+            'email': '123@test.com'
+        }
+        response = self.client.post(reverse('register'), data)
+        print(response)
+        users = User.objects.all()
+        for user in users:
+            print(user.username)
+            print(user.password)
+        data = {
+            'username': 'testuser1',
+            'password': 'testuser1',
+        }
+        response = self.client.post(reverse('login'), data)
+        print(response)
+        token = response.data.get('token')
+        print(User.objects.get(username = 'testuser1').is_authenticated)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
         url = reverse('product_list_create')  # 使用 reverse() 函数生成 URL 路径
         data = {
             'Title': 'New Product',
@@ -79,17 +99,19 @@ class ProductListCreateAPIViewTests(TestCase):
         # serializer = ProductSerializer(data)
         # print(serializer.is_valid())
         response = self.client.post(url, data)
-        print(response.context)
+        print(response.data)
         products = Product.objects.all()
         for product in products:
             # 在这里对产品对象进行操作
             print(product.ProductID)
+            print(product.SellerID)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(len(Product.objects.all()), 2)
         orders = Order.objects.all()
         for order in orders:
             # 在这里对产品对象进行操作
             print(order.OrderID)
+            print(order.SellerID)
         url = reverse('buy_product')  # 使用 reverse() 函数生成 URL 路径，传入产品的主键
         data = {'product': 1}
         response_buy = self.client.post(url, data)

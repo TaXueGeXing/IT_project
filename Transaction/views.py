@@ -19,7 +19,6 @@ class ProductListCreateAPIView(APIView):
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        data = request.data
         car = Car.objects.create(
             car_brand = request.POST.get('car_brand'),
             car_model = request.POST.get('car_model')
