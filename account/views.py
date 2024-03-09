@@ -20,18 +20,17 @@ def register(request):
     return Response(serializer.errors, status=400)
 
 # Token 认证的登录视图
-class TokenLoginView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
-        else:
-            return Response({'error': 'Invalid username or password'}, status=400)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def token_login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(username=username, password=password)
+    if user:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+    else:
+        return Response({'error': 'Invalid username or password'}, status=400)
 
 # 用户登出
 @api_view(['POST'])

@@ -3,6 +3,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
 
 class AccountTests(APITestCase):
 
@@ -38,6 +39,20 @@ class AccountTests(APITestCase):
         print(f"登录响应Token: {response.data.get('token', '无Token返回')}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        token = response.data['token']
+
+        # 使用获取的token访问受保护的视图
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+        
+        # 获取受保护视图的 URL
+        protected_view_url = reverse('order_history')
+    
+        # 尝试访问受保护的视图
+        response = self.client.get(protected_view_url)
+        # 验证是否成功访问受保护的视图
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print("用户成功登录，并使用token访问了受保护的视图。")
+    
     def test_logout(self):
         """
         测试用户登出
