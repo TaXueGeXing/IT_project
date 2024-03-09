@@ -1,84 +1,70 @@
-from django.shortcuts import render, redirect
+from django.http import HttpRequest
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from community.models import Article
 from community.models import Reply
-from Transaction.models import Product, Order
+from Transaction.models import Product
+from django.db.models import Count
+from .serializers import ProductSerializer
 
 
-def home_page(request):
-    return render(request, 'home.html')
-
-
+@api_view(['GET'])
 def homepage_view(request):
-    # 在首页视图函数中调用 ranking_view 获取排名信息
-    top_five_models = ranking()
-    # 调用首页文章和讨论区 'Discussion & Articles': 'Some other data'
-    top_article = Article.objects.order_by('-clicks').first
-    # 实时滚动评论区
+    if not isinstance(request, HttpRequest):
+        request = request._request
+    # 获取排名信息
+    top_five_models = ranking(request)
+    # 获取首页信息
+    top_article = Article.objects.order_by('-click').first()
     recent_replies = Reply.objects.order_by('-create_time')[:5]
-    # 传递排名信息和其他信息到首页
-    context = {'Best-Selling products': top_five_models, 'Articles': top_article, 'Discussion': recent_replies}
-    if request.method == 'POST':
-        # 调用 search_product 处理搜索，并将结果存储在 session 中
-        search_product(request)
-        # 重定向到交易页面
-        return redirect('transaction')
-    return render(request, 'homepage.html', context)
+
+    return Response({
+        'Best-Selling products': top_five_models,
+        'Articles': top_article,
+        'Discussion': recent_replies
+    })
 
 
-def ranking():
-    # 获取所有产品
-    all_products = Product.objects.all().order_by('-orders_count')
+@api_view(['GET'])
+def ranking(request):
+    # 使用 annotate 和 values 来计算每个型号的订单数量，并按数量降序排列取前五个
+    top_models = Product.objects.values('car__car_model', 'car__car_brand').annotate(order_count=Count('order')).order_by('-order_count')[:5]
 
-    # 前5名productModel
-    top_five_models = []
-
-    for product in all_products:
-        if product.carModel not in top_five_models:
-            top_five_models.append(product.carModel)
-            # 够五个
-            if len(top_five_models) == 5:
-                break
-
-    return top_five_models
+    return Response(top_models)
 
 
-def search_product(request):
-    # 处理搜索请求
-    result_products = None
+@api_view(['GET'])
+def search_product(request):#搜索没问题 跳转未知
+    # 获取交易页面信息
+    #default_products = Product.objects.filter( 默认未知
+       # Order__is_finished=False,
+        #Order__is_banned=False,
+        #Order__buyer_id=None
+    #).distinct()
+
     if request.method == 'GET':
         location = request.GET.get('Location')
-        brand = request.GET.get('Brand')
-        car_model = request.GET.get('Model')
+        brand = request.GET.get('car_brand')
+        car_model = request.GET.get('car_model')
         min_price = request.GET.get('Min_Price')
         max_price = request.GET.get('Max_Price')
 
         # 处理搜索结果
-        result_products = (Product.objects.filter(
-            car__Brand__icontains=brand,
-            car__CarModel__icontains=car_model,
+        result_products = Product.objects.filter(
+            car__car_brand__icontains=brand,
+            car__car_model__contains=car_model,
             Price__range=[min_price, max_price],
             Location__icontains=location
-        ))
+        )
+    else:
+        result_products = Product.objects.none()
+            #default_products
 
-    # 将搜索结果传递给交易页面
-    return redirect('transaction', result_products=result_products)
+    serializer = ProductSerializer(result_products, many=True)
+    return Response({'result_products': serializer.data})
 
 
-def transaction_view(request):
-    # 获取默认产品（未出售的）
-    default_products = Product.objects.filter(
-        Order__is_finished=False,
-        Order__is_banned=False,
-        Order__buyer_id=None
-    ).distinct()
-    # 获取搜索结果
-    result_products = request.session.get('result_products', None)
 
-    # 如果没有搜索结果，使用默认产品
-    if result_products is None:
-        result_products = default_products
 
-    context = {'result_products': result_products}
-    return render(request, 'transaction.html', context)
 
 

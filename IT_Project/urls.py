@@ -21,16 +21,17 @@ from django.urls import path
 from django.urls import path, include
 from account import views as auth_view
 from community import views
-from .view import about_us
-from .view import home_page
+from home_page.views import homepage_view
+# from .view import about_us
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', home_page, name='home_page'),
+    path('', homepage_view, name='home_page'),
     path('home/', include('home_page.urls')),
     path('carwiki/', include('car_wiki.urls')),
-    path('about-us/', about_us, name='about_us'),
+    # path('about-us/', about_us, name='about_us'),
 
     path('account/', include('account.urls')),
     path('community/', include('community.urls')),
