@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import Car, CarDetail, Image
+from .models import Car, CarDetail
 from .serializers import CarSerializer
 
 
@@ -16,19 +16,12 @@ def car_wiki(request):
 @api_view(['GET'])
 def search_car(request):
     if request.method == 'GET':
-        brand = request.GET.get('Brand')
-        car_model = request.GET.get('CarModel')
+        brand = request.GET.get('car_brand')
+        car_model = request.GET.get('car_model')
 
-        result_car = Car.objects.filter(
-            Brand__icontains=brand,
-            CarModel__icontains=car_model,
-        )
-
-        if result_car.exists():
-            serializer = CarSerializer(result_car.first())
-            return Response(serializer.data)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        result_car = Car.objects.get(car_brand=brand, car_model=car_model)
+        serializer = CarSerializer(result_car)
+        return Response(serializer.data)
 
 
 @api_view(['GET'])
