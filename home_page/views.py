@@ -5,7 +5,7 @@ from community.models import Article
 from community.models import Reply
 from Transaction.models import Product
 from django.db.models import Count
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ResultSerializer
 
 
 @api_view(['GET'])
@@ -16,13 +16,14 @@ def homepage_view(request):
     top_five_models = ranking(request)
     # 获取首页信息
     top_article = Article.objects.order_by('-click').first()
-    recent_replies = Reply.objects.order_by('-create_time')[:5]
+    recent_replies = Reply.objects.order_by('-time')[:5]
 
-    return Response({
+    data = {
         'Best-Selling products': top_five_models,
         'Articles': top_article,
         'Discussion': recent_replies
-    })
+    }
+    return Response(ResultSerializer(data).data)
 
 
 @api_view(['GET'])

@@ -9,3 +9,9 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['ProductID', 'SellerID', 'Date', 'Price', 'Description', 'Title', 'car', 'Location']
+
+
+class ResultSerializer(serializers.Serializer):
+    Best_Selling_products = serializers.ListField(source='Best-Selling products')
+    Articles = serializers.DictField()
+    Discussion = serializers.ListField()
