@@ -8,7 +8,7 @@ from car_wiki.models import Car
 
 class ProductSearchTestCase(TestCase):
     def setUp(self):
-        # 创建测试数据
+        # Create test data
         self.client = APIClient()
         self.user1 = User.objects.create(username='user1', password='password1', email='user1@example.com')
         self.user2 = User.objects.create(username='user2', password='password1', email='user1@example.com')
@@ -21,6 +21,7 @@ class ProductSearchTestCase(TestCase):
         self.product3 = Product.objects.create(SellerID=self.user3, Date='2022-01-02', Price=110, Description='Some description3', Title='So3me title', car=car3, Location='Location3')
 
     def test_search_product(self):
+        # Test search products
         query_params = {
             'car_brand': 'Brand1',
             'car_model': 'Model1',
@@ -29,23 +30,15 @@ class ProductSearchTestCase(TestCase):
             'Location': 'Location1',
         }
 
-        url = reverse('search_product')  # 替换成你的视图名称，可能是 'search_product' 或其他实际的名称
+        url = reverse('search_product')
         response = self.client.get(url, query_params)
-
-        # 发送 GET 请求
-
         print(response.content)
         print("Request URL:", url)
-        # 断言 HTTP 状态码为 200
         self.assertEqual(response.status_code, 200)
-
-        # 获取返回的数据
         result_products = response.json().get('result_products', [])
-
+        # Print result products
         print("Result Products:", result_products)
-
-
-        # 断言返回的数据符合预期
+        # Assert that the data returned is as expected
         self.assertEqual(result_products[0]['car']['car_brand'], 'Brand1')
-        self.assertEqual(result_products[0]['Price'], "100.00")  # 注意这里的数据类型，不再是字符串
+        self.assertEqual(result_products[0]['Price'], "100.00")
         self.assertEqual(result_products[0]['Location'], 'Location1')
