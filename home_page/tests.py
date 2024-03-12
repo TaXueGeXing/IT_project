@@ -1,11 +1,9 @@
 from django.contrib.auth.models import User
-from django.template.defaulttags import url
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from Transaction.models import Product
 from car_wiki.models import Car
-from home_page.serializers import ProductSerializer
 
 
 class ProductSearchTestCase(TestCase):
