@@ -17,23 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
-from django.urls import path
 from django.urls import path, include
-from account import views as auth_view
-from community import views
 from home_page.views import homepage_view
-# from .view import about_us
+from .view import about_us
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', homepage_view, name='home_page'),
-    path('home/', include('home_page.urls')),
-    path('carwiki/', include('car_wiki.urls')),
-    # path('about-us/', about_us, name='about_us'),
 
+    path('home/', include('home_page.urls')),
+    path('Transaction/', include('Transaction.urls')),
     path('account/', include('account.urls')),
     path('community/', include('community.urls')),
-    path('Transaction/', include('Transaction.urls')),
+    path('carwiki/', include('car_wiki.urls')),
+    path('about-us/', about_us, name='about_us'),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
