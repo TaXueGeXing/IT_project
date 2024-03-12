@@ -47,6 +47,5 @@ class ProductSearchTestCase(TestCase):
 
         # 断言返回的数据符合预期
         self.assertEqual(result_products[0]['car']['car_brand'], 'Brand1')
-
         self.assertEqual(result_products[0]['Price'], "100.00")  # 注意这里的数据类型，不再是字符串
         self.assertEqual(result_products[0]['Location'], 'Location1')
