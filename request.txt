@@ -1,0 +1,122 @@
+# 注册页面
+GET /register/ HTTP/1.1
+Host: yourwebsite.com
+{
+	password: xx
+	username: xx
+	email: xx
+}
+
+# 登录页面
+GET /login/ HTTP/1.1
+Host: yourwebsite.com
+{
+	password: xx
+	username: xx
+}
+
+# 登出页面
+GET /logout/ HTTP/1.1
+Host: yourwebsite.com
+
+# 修改密码
+POST /change-password/ HTTP/1.1
+Host: yourwebsite.com
+Content-Type: application/json
+    old_password
+    new_password
+
+
+# 更新用户资料
+POST /update-profile/ HTTP/1.1
+Host: yourwebsite.com
+Content-Type: application/json
+
+# 查看订单历史
+GET /order-history/ HTTP/1.1
+Host: yourwebsite.com
+
+# 车辆百科API
+GET /api/car_wiki/ HTTP/1.1
+Host: yourwebsite.com
+
+# 搜索汽车API
+GET /api/search_car/ HTTP/1.1
+Host: yourwebsite.com
+brand
+car_model
+
+# 汽车详情API
+GET /api/car_detail/123/ HTTP/1.1
+Host: yourwebsite.com
+
+# 社区页面
+GET /community/ HTTP/1.1
+Host: yourwebsite.com
+
+# 创建文章
+POST /articles/create/ HTTP/1.1
+Host: yourwebsite.com
+Content-Type: application/json
+title
+content
+tag
+
+# 创建回复
+POST /articles/123/replies/create/ HTTP/1.1
+Host: yourwebsite.com
+Content-Type: application/json
+reply
+
+
+# 文章列表
+GET /articles/ HTTP/1.1
+Host: yourwebsite.com
+
+# 搜索文章
+GET /articles/search/?query=search_query_here HTTP/1.1
+Host: yourwebsite.com
+query
+
+# 文章详情
+GET /articles/123/ HTTP/1.1
+Host: yourwebsite.com
+
+# 首页
+GET /homepage/ HTTP/1.1
+Host: yourwebsite.com
+
+# 搜索产品
+GET /search/product/?query=search_query_here HTTP/1.1
+Host: yourwebsite.com
+
+# 排行榜
+GET /ranking/ HTTP/1.1
+Host: yourwebsite.com
+
+# 产品列表API
+GET /api/products/ HTTP/1.1
+Host: yourwebsite.com
+
+# 创建产品API
+POST /api/products/ HTTP/1.1
+Host: yourwebsite.com
+Title 
+Date 
+Price 
+Description
+Location
+car_brand
+car_model
+
+# 购买产品API
+POST /api/buy/ HTTP/1.1
+Host: yourwebsite.com
+Content-Type: application/json
+product
+
+# 完成订单API
+POST /api/finishOrder/ HTTP/1.1
+Host: yourwebsite.com
+Content-Type: application/json
+order_pk
