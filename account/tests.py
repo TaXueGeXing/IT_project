@@ -3,80 +3,79 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate
 
 class AccountTests(APITestCase):
 
     def setUp(self):
-        # 创建一个用户以便测试登录和更新个人资料
+        # Create a user for testing login and profile update
         self.user = User.objects.create_user(username='testuser', password='testpassword123', email='testuser@example.com')
         self.token = Token.objects.create(user=self.user)
         
-        # 对于需要认证的请求，设置认证信息
+        # For authenticated requests, set the authentication header
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         #print(f"Created token for testuser: {self.token.key}")
         
     def test_register_user(self):
         """
-        测试用户注册
+        Test user registration
         """
-        print("\n\n===== 测试用户注册 =====")
+        print("\n\n===== Test User Registration =====")
         url = reverse('register')
         data = {'username': 'newuser', 'password': 'newuser123', 'email': 'newuser@example.com'}
         response = self.client.post(url, data, format='json')
-        print(f"注册用户响应: {response.data}")
+        print(f"Register user response: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_token_login(self):
         """
-        测试用户使用用户名和密码登录
+        Test user login with username and password
         """
-        print("\n\n===== 测试用户登录 =====")
+        print("\n\n===== Test User Login =====")
         url = reverse('login')
         data = {'username': 'testuser', 'password': 'testpassword123'}
         response = self.client.post(url, data, format='json')
-        print(f"登录响应Token: {response.data.get('token', '无Token返回')}")
+        print(f"Login response Token: {response.data.get('token', 'No Token Returned')}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         token = response.data['token']
 
-        # 使用获取的token访问受保护的视图
+        # Access a protected view with the acquired token
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
         
-        # 获取受保护视图的 URL
+        # Get the URL for a protected view
         protected_view_url = reverse('order_history')
     
-        # 尝试访问受保护的视图
+        # Attempt to access the protected view
         response = self.client.get(protected_view_url)
-        # 验证是否成功访问受保护的视图
+        # Verify successful access to the protected view
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print("用户成功登录，并使用token访问了受保护的视图。")
+        print("User successfully logged in and accessed a protected view with the token.")
     
     def test_logout(self):
         """
-        测试用户登出
+        Test user logout
         """
-        print("\n\n===== 测试用户登出 =====")
+        print("\n\n===== Test User Logout =====")
         url = reverse('logout')
         response = self.client.post(url, format='json')
-        print(f"登出响应状态: {response.data}")
+        print(f"Logout response status: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         
     def test_change_password(self):
         """
-        测试修改密码
+        Test password change
         """
-        print("\n\n===== 测试修改密码 =====")
+        print("\n\n===== Test Change Password =====")
         url = reverse('change_password')
         data = {'old_password': 'testpassword123', 'new_password': 'newpassword456'}
         response = self.client.post(url, data, format='json')
-        print("修改密码响应状态: 200 成功")
+        print("Change password response status: 200 OK")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        # 测试用新密码登录
+        # Test logging in with the new password
         self.client.logout()
-        print("测试使用新密码登录...")
+        print("Testing login with the new password...")
         url = reverse('login')
         data = {'username': 'testuser', 'password': 'newpassword456'}
         response = self.client.post(url, data, format='json')
@@ -84,26 +83,26 @@ class AccountTests(APITestCase):
 
     def test_update_profile(self):
         """
-        测试更新个人资料
+        Test updating user profile
         """
-        print("\n\n===== 测试更新个人资料 =====")
+        print("\n\n===== Test Update Profile =====")
         url = reverse('update_profile')
         data = {'username': 'updateduser', 'email': 'updateduser@example.com'}
         response = self.client.post(url, data, format='json')
-        print(f"更新资料响应: {response.data}")
+        print(f"Update profile response: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         self.user.refresh_from_db()
-        print(f"更新后的用户名: {self.user.username}, 邮箱: {self.user.email}")
+        print(f"Updated username: {self.user.username}, email: {self.user.email}")
         self.assertEqual(self.user.username, 'updateduser')
         self.assertEqual(self.user.email, 'updateduser@example.com')
 
     def test_order_history(self):
         """
-        测试查看订单历史
+        Test viewing order history
         """
-        print("\n\n===== 测试查看订单历史 =====")
+        print("\n\n===== Test Viewing Order History =====")
         url = reverse('order_history')
         response = self.client.get(url, format='json')
-        print(f"订单历史响应: {response.data}")
+        print(f"Order history response: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -7,12 +7,12 @@ from rest_framework.authtoken.models import Token
 
 class ArticleTests(APITestCase):
     def setUp(self):
-        # 创建测试用户和Token认证
+        # Create test user and Token authentication
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        # 创建测试文章和回复
+        # Create test article and reply
         self.article = Article.objects.create(title='Test Article', content='Test Content', tag='Test', user=self.user)
         self.reply = Reply.objects.create(article=self.article, content='Test Reply', user=self.user, time='2021-01-01T00:00:00Z')
 

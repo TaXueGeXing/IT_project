@@ -7,7 +7,7 @@ from Transaction.models import Order
 from .serializers import UserRegisterSerializer, UserProfileSerializer
 from Transaction.serializers import OrderSerializer
 
-# 用户注册
+# User registration
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -18,7 +18,7 @@ def register(request):
         return Response({'message': 'User created successfully', 'token': token.key}, status=201)
     return Response(serializer.errors, status=400)
 
-# Token 认证的登录视图
+# Token authentication login view
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def token_login(request):
@@ -31,14 +31,14 @@ def token_login(request):
     else:
         return Response({'error': 'Invalid username or password'}, status=400)
 
-# 用户登出
+# User logout
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def user_logout(request):
     request.user.auth_token.delete()
     return Response({'message': 'Successfully logged out.'}, status=204)
 
-# 修改密码
+# Change password
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def change_password(request):
@@ -53,7 +53,7 @@ def change_password(request):
     user.save()
     return Response({'message': 'Password updated successfully.'}, status=200)
 
-# 更新个人资料
+# Update profile
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_profile(request):
@@ -63,7 +63,7 @@ def update_profile(request):
         return Response({'message': 'Profile updated successfully'})
     return Response(serializer.errors, status=400)
 
-# 查看订单历史
+# View order history
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def order_history(request):
