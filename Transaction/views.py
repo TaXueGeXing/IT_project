@@ -20,16 +20,16 @@ class ProductListCreateAPIView(APIView):
             return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
         
         car = Car.objects.create(
-            car_brand = request.POST.get('car_brand'),
-            car_model = request.POST.get('car_model')
+            car_brand = request.data.get('car_brand'),
+            car_model = request.data.get('car_model')
         )
 
         product = Product.objects.create(
-            Title = request.POST.get('Title'),
-            Date = request.POST.get('Date'),
-            Price = request.POST.get('Price'),
-            Description = request.POST.get('Description'),
-            Location = request.POST.get('Location'),
+            Title = request.data.get('Title'),
+            Date = request.data.get('Date'),
+            Price = request.data.get('Price'),
+            Description = request.data.get('Description'),
+            Location = request.data.get('Location'),
             SellerID = request.user,
             car = car
         )
@@ -57,7 +57,7 @@ class BuyProductAPIView(APIView):
         self.permission_classes = [IsAuthenticated]
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
-        product = request.POST.get('product')
+        product = request.data.get('product')
         order = Order.objects.get(ProductID = product)
         order.BuyerID = request.user
         order.save()
@@ -72,7 +72,7 @@ class FinishOrderAPIView(APIView):
         self.permission_classes = [IsAuthenticated]
         if not request.user.is_authenticated:
             return Response({'error': 'You must be authenticated to create a product.'}, status=status.HTTP_401_UNAUTHORIZED)
-        order_pk = request.POST.get('order_pk')
+        order_pk = request.data.get('order_pk')
         order = Order.objects.get(OrderID = order_pk)
         order.IsFinished = True
         order.save()
